@@ -7,7 +7,6 @@ import {
   useNavigation,
   Action,
   Toast,
-  getPreferenceValues,
   closeMainWindow,
   PopToRootType,
   Keyboard,
@@ -48,10 +47,6 @@ type CreatePageFormProps = {
   defaults?: Partial<CreatePageFormValues>;
 };
 
-type CreatePageFormPreferences = {
-  closeAfterCreate: boolean;
-};
-
 type Quicklink = Action.CreateQuicklink.Props["quicklink"];
 
 const createPropertyId = (property: DatabaseProperty) => "property::" + property.type + "::" + property.id;
@@ -60,7 +55,7 @@ const NON_EDITABLE_PROPERTY_TYPES = ["formula"];
 const filterNoEditableProperties = (dp: DatabaseProperty) => !NON_EDITABLE_PROPERTY_TYPES.includes(dp.type);
 
 export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFormProps) {
-  const preferences = getPreferenceValues<CreatePageFormPreferences>();
+  const closeAfterCreate = true;
   const defaultValues = launchContext?.defaults ?? defaults;
   const initialDatabaseId = defaultValues?.database;
 
@@ -158,7 +153,7 @@ export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFo
   }
 
   function getQuicklink(): Quicklink {
-    const url = "raycast://extensions/HenriChabrand/notion/create-database-page";
+    const url = "raycast://extensions/HenriChabrand/notion/take-quick-notes";
     const launchContext: LaunchContext = { defaults: values, visiblePropIds: visiblePropIds ?? databasePropertyIds };
     let name: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -191,7 +186,7 @@ export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFo
     const shortcut: Keyboard.Shortcut | undefined =
       type === "second" ? { modifiers: ["cmd", "shift"], key: "enter" } : undefined;
 
-    if ((!preferences.closeAfterCreate && type === "main") || (preferences.closeAfterCreate && type === "second")) {
+    if ((!closeAfterCreate && type === "main") || (closeAfterCreate && type === "second")) {
       return <Action.SubmitForm title="Create Page" icon={Icon.Plus} onSubmit={handleSubmit} shortcut={shortcut} />;
     } else {
       return (
@@ -244,8 +239,17 @@ export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFo
         </ActionPanel>
       }
     >
+      {databaseProperties?.filter(filterProperties).sort(sortProperties).map(convertToField)}
+      <Form.Separator />
+      <Form.TextArea
+        {...itemProps["content"]}
+        id="content"
+        title="Page Content"
+        enableMarkdown
+      />
       {initialDatabaseId ? null : (
         <>
+          <Form.Separator key="separator" />
           <Form.Dropdown
             title="Database"
             {...itemProps.database}
@@ -254,46 +258,31 @@ export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFo
               itemProps.database.onChange?.(value);
             }}
           >
-            {databases?.map((d: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-              return (
-                <Form.Dropdown.Item
-                  key={d.id}
-                  value={d.id}
-                  title={d.title ? d.title : "Untitled"}
-                  icon={
-                    d.icon_emoji
-                      ? d.icon_emoji
-                      : d.icon_file
-                        ? d.icon_file
-                        : d.icon_external
-                          ? d.icon_external
-                          : Icon.List
-                  }
-                />
-              );
-            })}
+            {databases?.map(
+              (
+                d: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+              ) => {
+                return (
+                  <Form.Dropdown.Item
+                    key={d.id}
+                    value={d.id}
+                    title={d.title ? d.title : "Untitled"}
+                    icon={
+                      d.icon_emoji
+                        ? d.icon_emoji
+                        : d.icon_file
+                          ? d.icon_file
+                          : d.icon_external
+                            ? d.icon_external
+                            : Icon.List
+                    }
+                  />
+                );
+              },
+            )}
           </Form.Dropdown>
-          <Form.Separator key="separator" />
         </>
       )}
-
-      {databaseProperties?.filter(filterProperties).sort(sortProperties).map(convertToField)}
-      <Form.Separator />
-      <Form.TextArea
-        {...itemProps["content"]}
-        id="content"
-        title="Page Content"
-        enableMarkdown
-        info="Parses Markdown to Notion Blocks.
-
-It supports:
-- Headings (levels 4 to 6 are treated as 3 on Notion)
-- Numbered, bulleted, and to-do lists
-- Code blocks, block quotes, and tables
-- Text formatting; italics, bold, strikethrough, inline code, hyperlinks
-
-Please note that HTML tags and thematic breaks are not supported in Notion due to its limitations."
-      />
     </Form>
   );
 }

@@ -102,8 +102,6 @@ export function PageListItem({
 
   const title = page.title ? page.title : "Untitled";
 
-  const { primaryAction } = getPreferenceValues<Preferences.SearchPage>();
-
   const openInRaycastAction = {
     page: (
       <Action.Push
@@ -167,8 +165,8 @@ export function PageListItem({
       actions={
         <ActionPanel>
           <ActionPanel.Section title={title}>
-            {primaryAction === "notion" ? actions["notionDefaultOpen"] : actions["raycast"]}
-            {primaryAction === "notion" ? actions["raycast"] : actions["notionDefaultOpen"]}
+            {actions["notionDefaultOpen"]}
+            {actions["raycast"]}
             {actions["notionAltOpen"]}
             {customActions?.map((action) => action)}
             {databaseProperties ? (

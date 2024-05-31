@@ -11,21 +11,106 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "index",
-      "title": "Create a Page",
-      "subtitle": "Create a Page to Database",
-      "description": "Create a Page to Database",
+      "name": "create-database-page",
+      "title": "Create Database Page",
+      "subtitle": "Notion",
+      "description": "Create a page in a Notion database.",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "closeAfterCreate",
+          "type": "checkbox",
+          "label": "Close Raycast after creating the page",
+          "required": false,
+          "default": false,
+          "description": "This action will be set as the primary action (⌘ + ⏎)."
+        }
+      ]
+    },
+    {
+      "name": "search-page",
+      "title": "Search Notion",
+      "description": "Search for Notion databases and pages.",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "primaryAction",
+          "type": "dropdown",
+          "title": "Primary Action",
+          "required": false,
+          "default": "notion",
+          "data": [
+            {
+              "title": "Open in Notion",
+              "value": "notion"
+            },
+            {
+              "title": "Preview in Raycast",
+              "value": "raycast"
+            }
+          ],
+          "description": "Choose the primary action for the Notion Pages list."
+        }
+      ]
+    },
+    {
+      "name": "quick-capture",
+      "title": "Quick Capture",
+      "description": "Capture something and put it out in a Notion page.",
       "mode": "view"
+    },
+    {
+      "description": "Append or prepend text, along with date, to a Notion page.",
+      "mode": "view",
+      "name": "add-text-to-page",
+      "subtitle": "Notion",
+      "title": "Add Text to Page",
+      "arguments": [
+        {
+          "name": "text",
+          "type": "text",
+          "title": "Text",
+          "placeholder": "Text",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "preferences": [
+    {
+      "name": "notion_token",
+      "type": "password",
+      "title": "Internal Integration Secret",
+      "required": false,
+      "description": "In Notion, go to Settings & members > My connections > Develop or manage integrations > New integration",
+      "placeholder": "secret_FGDeSrZNodQuaJEqWzvxcTyrPlpBHYvdLpTZykrWEu"
+    },
+    {
+      "name": "open_in",
+      "type": "appPicker",
+      "title": "Open Page in",
+      "required": false,
+      "default": "Notion",
+      "description": "Choose where to open Notion page."
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.75.2"
+    "@mozilla/readability": "^0.5.0",
+    "@notionhq/client": "^2.2.15",
+    "@raycast/api": "^1.75.2",
+    "@raycast/utils": "^1.15.0",
+    "@tryfabric/martian": "github:tryfabric/martian",
+    "date-fns": "^3.6.0",
+    "linkedom": "^0.18.2",
+    "node-fetch": "^3.3.2",
+    "notion-to-md": "^3.1.1"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.6",
     "@types/node": "20.8.10",
     "@types/react": "18.2.27",
     "eslint": "^8.51.0",
+    "eslint-plugin-import": "^2.29.1",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2"
   },

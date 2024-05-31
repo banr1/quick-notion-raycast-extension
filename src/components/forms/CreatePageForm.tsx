@@ -56,8 +56,8 @@ type Quicklink = Action.CreateQuicklink.Props["quicklink"];
 
 const createPropertyId = (property: DatabaseProperty) => "property::" + property.type + "::" + property.id;
 
-const NON_EDITABLE_PROPETY_TYPES = ["formula"];
-const filterNoEditableProperties = (dp: DatabaseProperty) => !NON_EDITABLE_PROPETY_TYPES.includes(dp.type);
+const NON_EDITABLE_PROPERTY_TYPES = ["formula"];
+const filterNoEditableProperties = (dp: DatabaseProperty) => !NON_EDITABLE_PROPERTY_TYPES.includes(dp.type);
 
 export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFormProps) {
   const preferences = getPreferenceValues<CreatePageFormPreferences>();
@@ -80,7 +80,7 @@ export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFo
   const initialValues: Partial<CreatePageFormValues> = { database: databaseId ?? undefined };
   const validation: Parameters<typeof useForm<CreatePageFormValues>>[0]["validation"] = {};
   for (const { id, type } of databaseProperties) {
-    if (NON_EDITABLE_PROPETY_TYPES.includes(type)) continue;
+    if (NON_EDITABLE_PROPERTY_TYPES.includes(type)) continue;
     const key = "property::" + type + "::" + id;
     if (type == "title") validation[key] = FormValidation.Required;
     let value = defaultValues?.[key];
@@ -161,7 +161,8 @@ export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFo
     const url = "raycast://extensions/HenriChabrand/notion/create-database-page";
     const launchContext: LaunchContext = { defaults: values, visiblePropIds: visiblePropIds ?? databasePropertyIds };
     let name: string | undefined;
-    const databaseTitle = databases.find((d) => d.id == databaseId)?.title;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const databaseTitle = databases.find((d: any) => d.id == databaseId)?.title;
     if (databaseTitle) name = "Create new page in " + databaseTitle;
     return { name, link: url + "?launchContext=" + encodeURIComponent(JSON.stringify(launchContext)) };
   }
@@ -253,7 +254,7 @@ export function CreatePageForm({ mutate, launchContext, defaults }: CreatePageFo
               itemProps.database.onChange?.(value);
             }}
           >
-            {databases?.map((d) => {
+            {databases?.map((d: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
               return (
                 <Form.Dropdown.Item
                   key={d.id}
